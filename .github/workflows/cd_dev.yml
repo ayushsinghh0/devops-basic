@@ -7,8 +7,10 @@ on:
 
   jobs:
     redeploy_everything:
-     - name: SSH Into server
-     - run : | 
+    run-on: ubuntu-latest
+    steps:
+      name: SSH Into server
+      run : | 
           $ {{secrets.SSH_PRIVATE_KEY}} &> ~/ssh_key
           ssh i ~/ssh_key root@44.201.56.84
           cd devops-basic/ && git pull
