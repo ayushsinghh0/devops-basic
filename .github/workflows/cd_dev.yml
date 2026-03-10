@@ -11,7 +11,7 @@ on:
     name: Deploying everything to the staging cluster
     steps:
       - run : | 
-          $ {{secrets.SSH_PRIVATE_KEY}} &> ~/ssh_key
+          $ "{{secrets.SSH_PRIVATE_KEY}}" &> ~/ssh_key
           ssh i ~/ssh_key root@44.201.56.84
           cd devops-basic/ && git pull
           pnpm install
