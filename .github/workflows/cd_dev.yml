@@ -3,18 +3,32 @@ name: Deploy to development
 on:
   push:
     branches:
-     - "main"
+      - main
 
-  jobs:
-    redeploy_everything:
-    run-on: ubuntu-latest
+jobs:
+  redeploy_everything:
+    runs-on: ubuntu-latest
     name: Deploying everything to the staging cluster
+
     steps:
-      - run : | 
-          "${{secrets.SSH_PRIVATE_KEY}}" &> ~/ssh_key
-          mkdir -p /home/runner/.ssh
-          ls /home/runner/.ssh
-          touch /home/runner/.ssh/known_hosts
-          echo "${{secrets.KNOWN_HOST}}" &> ~/home/runner/.ssh/known_hosts
-          chmod 700 /home/runner/ssh_key
-          ssh i ~/ssh_key root@44.201.56.84 -t "cd devops-basic/ && git pull origin main && pnpm install && pnpm run build && pm2 restart web && pm2 restart http-server && pm2 restart ws-server"
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup SSH
+        run: |
+          mkdir -p ~/.ssh
+          echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/id_rsa
+          chmod 600 ~/.ssh/id_rsa
+          echo "${{ secrets.KNOWN_HOST }}" >> ~/.ssh/known_hosts
+
+      - name: Deploy to server
+        run: |
+          ssh -i ~/.ssh/id_rsa root@44.201.56.84 << 'EOF'
+            cd devops-basic
+            git pull origin main
+            pnpm install
+            pnpm run build
+            pm2 restart web
+            pm2 restart http-server
+            pm2 restart ws-server
+          EOF
