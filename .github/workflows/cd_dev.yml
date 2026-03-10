@@ -8,9 +8,9 @@ on:
   jobs:
     redeploy_everything:
     run-on: ubuntu-latest
+    name: Deploying everything to the staging cluster
     steps:
-      name: SSH Into server
-      run : | 
+      - run : | 
           $ {{secrets.SSH_PRIVATE_KEY}} &> ~/ssh_key
           ssh i ~/ssh_key root@44.201.56.84
           cd devops-basic/ && git pull
