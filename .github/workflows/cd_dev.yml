@@ -6,4 +6,14 @@ on:
      - "main"
 
   jobs:
-    redeploy
+    redeploy_everything:
+     - name: SSH Into server
+     - run : | 
+          $ {{secrets.SSH_PRIVATE_KEY}} &> ~/ssh_key
+          ssh i ~/ssh_key root@44.201.56.84
+          cd devops-basic/ && git pull
+          pnpm install
+          pnpm run build
+          pm2 restart web
+          pm2 restart http-server
+          pm2 restart ws-server
